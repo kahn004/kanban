@@ -8,9 +8,12 @@ var ROOT_PATH = path.resolve(__dirname);
 
 var common = {
 	entry: path.resolve(ROOT_PATH, 'app'),
+	resolve: {
+		extensions: ['', '.js', '.jsx']
+	},
 	output: {
 		path: path.resolve(ROOT_PATH, 'build'),
-		filename: 'build.js'
+		filename: 'bundle.js'
 	},
 	module: {
 		loaders: [
@@ -20,12 +23,26 @@ var common = {
 				include: path.resolve(ROOT_PATH, 'app')
 			}
 		]
-	}
+	},
+	plugins: [
+		new HtmlwebpackPlugin({
+			title: 'Kanban app'
+		})
+	]
 };
 
 if (TARGET === 'start' || !TARGET) {
 	module.exports = merge(common, {
 		devtool: 'eval-source-map',
+		module: {
+			loaders: [
+				{
+					test: /\.jsx?$/,
+					loaders: ['react-hot', 'babel'],
+					include: path.resolve(ROOT_PATH, 'app')
+				}
+			]
+		},
 		devServer: {
 		    historyApiFallback: true,
 		    hot: true,
@@ -34,10 +51,7 @@ if (TARGET === 'start' || !TARGET) {
 		    port: 4000
 		},
 		plugins: [
-			new webpack.HotModuleReplacementPlugin(),
-			new HtmlwebpackPlugin({
-				title: 'Kanban app'
-			})
+			new webpack.HotModuleReplacementPlugin()
 		]
 	});
 }

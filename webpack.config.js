@@ -2,6 +2,7 @@ var path = require('path');
 var HtmlwebpackPlugin = require('html-webpack-plugin');
 var webpack = require('webpack');
 var merge = require('webpack-merge');
+var Clean = require('clean-webpack-plugin');
 
 var TARGET = process.env.npm_lifecycle_event;
 var ROOT_PATH = path.resolve(__dirname);
@@ -52,6 +53,34 @@ if (TARGET === 'start' || !TARGET) {
 		},
 		plugins: [
 			new webpack.HotModuleReplacementPlugin()
+		]
+	});
+}
+
+if(TARGET === 'build') {
+	module.exports = merge(common, {
+		devtool: 'source-map',
+		module: {
+			loaders: [
+			    {
+					test: /\.jsx?$/,
+					loaders: ['babel'],
+					include: path.resolve(ROOT_PATH, 'app')
+			    }
+			]
+		},
+		plugins: [
+			new Clean(['build']),
+			new webpack.optimize.UglifyJsPlugin({
+				compress: {
+					warnings: false
+				}
+			})
+			// new webpack.DefinePlugin({
+			// 	'process.env': {
+			// 		'NODE_env': JSON.stringify('production')
+			// 	}
+			// })
 		]
 	});
 }
